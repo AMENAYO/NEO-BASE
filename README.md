@@ -1,18 +1,18 @@
 # 🚀 NEO BASE
 
-NEO BASE is a free and open-source decentralized storage network.
+NEO BASE is an open-source, ultra-secure decentralized storage network.
 
 ## Vision
-Create a global distributed cloud powered by users.
+A global encrypted cloud, free for everyone.
 
 ## Features
 - Peer-to-peer storage
-- Encrypted data
-- No central authority
+- AES + RSA encryption
+- Open source
 - Community driven
 
 ## Status
-Early prototype.
+Prototype
 
-## Join the movement
-Contribute, test, fork, improve.
+## Contribution
+Fork, improve, test, share.
