@@ -17,10 +17,12 @@ await fs.ensureDir(STORAGE_PATH);
 const peers = new Set();
 await discoverPeers(config, peers);
 
+// List of peers / Liste des pairs
 app.get("/peers", (req, res) => {
   res.json([...peers, `http://localhost:${config.port}`]);
 });
 
+// Store data / Stocker les données
 app.post("/store", async (req, res) => {
   const { content } = req.body;
   const id = uuidv4();
@@ -32,19 +34,21 @@ app.post("/store", async (req, res) => {
   res.json({ success: true, id });
 });
 
+// Replicate / Réplication
 app.post("/replicate", async (req, res) => {
   const { id, content } = req.body;
   await fs.writeFile(`${STORAGE_PATH}/${id}.neo`, content);
   res.json({ replicated: true });
 });
 
+// Retrieve / Récupérer
 app.get("/file/:id", async (req, res) => {
   try {
     const encrypted = await fs.readFile(`${STORAGE_PATH}/${req.params.id}.neo`, "utf8");
     res.json({ content: decrypt(encrypted) });
   } catch {
-    res.status(404).json({ error: "Not found" });
+    res.status(404).json({ error: "Not found / Introuvable" });
   }
 });
 
-app.listen(config.port, () => console.log(`🚀 NEO NODE ${config.username} ready`));
+app.listen(config.port, () => console.log(`🚀 NEO NODE ${config.username} ready / prêt`));
