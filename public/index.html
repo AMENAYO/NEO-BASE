@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>NEO BASE</title>
+  <title>NEO BASE - Frontend Only</title>
   <style>
     body { background:black; color:yellow; font-family:Arial; text-align:center; padding:50px; }
     input, textarea, button { padding:10px; margin:10px; width:300px; background:black; color:yellow; border:1px solid yellow; }
     button:hover { background:yellow; color:black; }
+    h1,h2 { margin: 10px; }
+    pre { text-align:left; max-width: 600px; margin:auto; background:#111; padding:10px; border:1px solid yellow; overflow-x:auto; }
   </style>
 </head>
 <body>
+
   <h1>🚀 NEO BASE</h1>
 
   <h2>Register / Inscription</h2>
@@ -30,52 +33,88 @@
   <pre id="output"></pre>
 
 <script>
+// ======== Simple frontend storage system =========
+
+// Users & data stored in localStorage
+// Structure:
+// localStorage['neo_users'] = { username: hashedPassword, ... }
+// localStorage['neo_data'] = { username: { fileId: content, ... }, ... }
+
+function hash(str) {
+  // Simple hash (not cryptographically secure)
+  let hash = 0;
+  for(let i=0;i<str.length;i++){
+    hash = (hash<<5)-hash + str.charCodeAt(i);
+    hash = hash & hash;
+  }
+  return hash.toString();
+}
+
+function getUsers() {
+  return JSON.parse(localStorage.getItem('neo_users')||'{}');
+}
+
+function getData() {
+  return JSON.parse(localStorage.getItem('neo_data')||'{}');
+}
+
+function saveUsers(users) {
+  localStorage.setItem('neo_users', JSON.stringify(users));
+}
+
+function saveData(data) {
+  localStorage.setItem('neo_data', JSON.stringify(data));
+}
+
 let loggedUser = null;
-let loggedPass = null;
 
-async function register() {
-  const username = document.getElementById("regUser").value;
-  const password = document.getElementById("regPass").value;
-  const res = await fetch("/register", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({username, password})
-  });
-  const data = await res.json();
-  document.getElementById("output").innerText = data.success ? "Registered / Inscrit" : data.error;
+// ===== Register =====
+function register() {
+  const username = document.getElementById('regUser').value.trim();
+  const password = document.getElementById('regPass').value;
+  if(!username || !password){ alert("Fill all / Remplir tout"); return; }
+  let users = getUsers();
+  if(users[username]) { alert("User exists / Utilisateur existe"); return; }
+  users[username] = hash(password);
+  saveUsers(users);
+  document.getElementById('output').innerText = "Registered / Inscrit";
 }
 
-async function login() {
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  const res = await fetch("/login", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({username, password})
-  });
-  const data = await res.json();
-  if(data.success) { loggedUser=username; loggedPass=password; document.getElementById("output").innerText="Logged in / Connecté"; }
-  else document.getElementById("output").innerText=data.error;
+// ===== Login =====
+function login() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  let users = getUsers();
+  if(users[username] !== hash(password)) { document.getElementById('output').innerText = "Invalid / Invalide"; return; }
+  loggedUser = username;
+  document.getElementById('output').innerText = "Logged in / Connecté";
 }
 
-async function store() {
-  if(!loggedUser) { alert("Login first / Connectez-vous d'abord"); return; }
-  const content = document.getElementById("data").value;
-  const res = await fetch("/store", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({ content, username: loggedUser, password: loggedPass })
-  });
-  const data = await res.json();
-  document.getElementById("output").innerText = data.success ? "Stored ID / ID stocké: " + data.id : data.error;
+// ===== Store data =====
+function store() {
+  if(!loggedUser){ alert("Login first / Connectez-vous d'abord"); return; }
+  const content = document.getElementById('data').value;
+  if(!content){ alert("Enter data / Entrez les données"); return; }
+  let data = getData();
+  if(!data[loggedUser]) data[loggedUser] = {};
+  const fileId = 'file_' + Date.now();
+  data[loggedUser][fileId] = content;
+  saveData(data);
+  document.getElementById('output').innerText = "Stored ID / ID stocké: " + fileId;
 }
 
-async function listFiles() {
-  if(!loggedUser) { alert("Login first / Connectez-vous d'abord"); return; }
-  const res = await fetch("/files/" + loggedUser);
-  const data = await res.json();
-  document.getElementById("output").innerText = data.files ? JSON.stringify(data.files, null, 2) : data.error;
+// ===== List files =====
+function listFiles() {
+  if(!loggedUser){ alert("Login first / Connectez-vous d'abord"); return; }
+  let data = getData();
+  const files = data[loggedUser] || {};
+  let text = '';
+  for(const id in files){
+    text += id + " : " + files[id] + "\n";
+  }
+  document.getElementById('output').innerText = text || "No files / Aucun fichier";
 }
 </script>
+
 </body>
 </html>
