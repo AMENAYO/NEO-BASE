@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// Discover peers / Découverte des pairs
 export async function discoverPeers(config, peers) {
   for (const peer of config.bootstrapPeers) {
     try {
@@ -10,6 +11,7 @@ export async function discoverPeers(config, peers) {
   }
 }
 
+// Broadcast data / Diffuser les données
 export async function broadcast(peers, path, data) {
   for (const peer of peers) {
     try {
