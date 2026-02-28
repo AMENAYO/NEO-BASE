@@ -3,25 +3,9 @@
 <head>
   <title>NEO BASE</title>
   <style>
-    body {
-      background: #0f0f0f;
-      color: #00ffcc;
-      font-family: Arial;
-      text-align: center;
-      padding: 50px;
-    }
-    input, textarea, button {
-      padding: 10px;
-      margin: 10px;
-      width: 300px;
-      background: black;
-      color: #00ffcc;
-      border: 1px solid #00ffcc;
-    }
-    button:hover {
-      background: #00ffcc;
-      color: black;
-    }
+    body { background:#0f0f0f; color:#00ffcc; font-family:Arial; text-align:center; padding:50px; }
+    input, textarea, button { padding:10px; margin:10px; width:300px; background:black; color:#00ffcc; border:1px solid #00ffcc; }
+    button:hover { background:#00ffcc; color:black; }
   </style>
 </head>
 <body>
@@ -40,20 +24,18 @@ async function store() {
   const content = document.getElementById("data").value;
   const res = await fetch("/store", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type":"application/json"},
     body: JSON.stringify({ content })
   });
   const data = await res.json();
-  document.getElementById("output").innerText =
-    "Stored ID: " + data.id;
+  document.getElementById("output").innerText = "Stored ID: " + data.id;
 }
 
 async function getFile() {
   const id = document.getElementById("fileId").value;
   const res = await fetch("/file/" + id);
   const data = await res.json();
-  document.getElementById("output").innerText =
-    data.content || "Not found";
+  document.getElementById("output").innerText = data.content || "Not found";
 }
 </script>
 </body>
