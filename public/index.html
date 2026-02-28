@@ -1,21 +1,81 @@
-<style>
-  body { 
-    background: black; 
-    color: yellow; 
-    font-family: Arial; 
-    text-align: center; 
-    padding: 50px; 
-  }
-  input, textarea, button { 
-    padding: 10px; 
-    margin: 10px; 
-    width: 300px; 
-    background: black; 
-    color: yellow; 
-    border: 1px solid yellow; 
-  }
-  button:hover { 
-    background: yellow; 
-    color: black; 
-  }
-</style>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NEO BASE</title>
+  <style>
+    body { background:black; color:yellow; font-family:Arial; text-align:center; padding:50px; }
+    input, textarea, button { padding:10px; margin:10px; width:300px; background:black; color:yellow; border:1px solid yellow; }
+    button:hover { background:yellow; color:black; }
+  </style>
+</head>
+<body>
+  <h1>🚀 NEO BASE</h1>
+
+  <h2>Register / Inscription</h2>
+  <input id="regUser" placeholder="Username / Nom"><br>
+  <input id="regPass" placeholder="Password / Mot de passe" type="password"><br>
+  <button onclick="register()">Register / Inscription</button>
+
+  <h2>Login / Connexion</h2>
+  <input id="username" placeholder="Username / Nom"><br>
+  <input id="password" placeholder="Password / Mot de passe" type="password"><br>
+  <button onclick="login()">Login / Connexion</button>
+
+  <h2>Store Data / Stocker des données</h2>
+  <textarea id="data" placeholder="Enter data / Entrez les données"></textarea><br>
+  <button onclick="store()">Store / Stocker</button>
+
+  <h2>Your Files / Vos fichiers</h2>
+  <button onclick="listFiles()">List / Lister</button>
+  <pre id="output"></pre>
+
+<script>
+let loggedUser = null;
+let loggedPass = null;
+
+async function register() {
+  const username = document.getElementById("regUser").value;
+  const password = document.getElementById("regPass").value;
+  const res = await fetch("/register", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({username, password})
+  });
+  const data = await res.json();
+  document.getElementById("output").innerText = data.success ? "Registered / Inscrit" : data.error;
+}
+
+async function login() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  const res = await fetch("/login", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({username, password})
+  });
+  const data = await res.json();
+  if(data.success) { loggedUser=username; loggedPass=password; document.getElementById("output").innerText="Logged in / Connecté"; }
+  else document.getElementById("output").innerText=data.error;
+}
+
+async function store() {
+  if(!loggedUser) { alert("Login first / Connectez-vous d'abord"); return; }
+  const content = document.getElementById("data").value;
+  const res = await fetch("/store", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({ content, username: loggedUser, password: loggedPass })
+  });
+  const data = await res.json();
+  document.getElementById("output").innerText = data.success ? "Stored ID / ID stocké: " + data.id : data.error;
+}
+
+async function listFiles() {
+  if(!loggedUser) { alert("Login first / Connectez-vous d'abord"); return; }
+  const res = await fetch("/files/" + loggedUser);
+  const data = await res.json();
+  document.getElementById("output").innerText = data.files ? JSON.stringify(data.files, null, 2) : data.error;
+}
+</script>
+</body>
+</html>
