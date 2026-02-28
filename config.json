@@ -1,0 +1,7 @@
+{
+  "username": "yann",
+  "port": 4000,
+  "bootstrapPeers": [
+    "http://localhost:4001"
+  ]
+}
