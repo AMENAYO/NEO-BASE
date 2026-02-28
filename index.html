@@ -11,11 +11,11 @@
 <body>
   <h1>🚀 NEO BASE</h1>
 
-  <textarea id="data" placeholder="Enter data"></textarea><br>
-  <button onclick="store()">Store</button>
+  <textarea id="data" placeholder="Enter data / Entrez les données"></textarea><br>
+  <button onclick="store()">Store / Stocker</button>
 
-  <input id="fileId" placeholder="File ID"><br>
-  <button onclick="getFile()">Retrieve</button>
+  <input id="fileId" placeholder="File ID / ID du fichier"><br>
+  <button onclick="getFile()">Retrieve / Récupérer</button>
 
   <pre id="output"></pre>
 
@@ -28,14 +28,14 @@ async function store() {
     body: JSON.stringify({ content })
   });
   const data = await res.json();
-  document.getElementById("output").innerText = "Stored ID: " + data.id;
+  document.getElementById("output").innerText = "Stored ID / ID stocké: " + data.id;
 }
 
 async function getFile() {
   const id = document.getElementById("fileId").value;
   const res = await fetch("/file/" + id);
   const data = await res.json();
-  document.getElementById("output").innerText = data.content || "Not found";
+  document.getElementById("output").innerText = data.content || "Not found / Introuvable";
 }
 </script>
 </body>
